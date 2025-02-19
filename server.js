@@ -31,10 +31,15 @@ requiredEnvVars.forEach((key) => {
 
 // ✅ Initialize Express
 const app = express();
+
+// ✅ CORS Configuration (Allows all origins for testing)
 app.use(cors({
-  origin: "https://frontend-43oigxs4g-nijlas-projects.vercel.app", // ✅ Allow frontend access
-  credentials: true,
+  origin: "*", // 🔥 Allow all origins for public access
+  methods: ["GET", "POST"], 
+  allowedHeaders: ["Content-Type"],
+  credentials: false, // 🔥 Set to true if you need cookies/auth
 }));
+
 app.use(express.json());
 
 // ✅ MongoDB Connection
