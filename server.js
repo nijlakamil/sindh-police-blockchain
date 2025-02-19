@@ -32,12 +32,12 @@ requiredEnvVars.forEach((key) => {
 // ✅ Initialize Express
 const app = express();
 
-// ✅ CORS Configuration (Allows all origins for testing)
+// ✅ CORS Configuration (Allow only your Vercel frontend)
 app.use(cors({
-  origin: "*", // 🔥 Allow all origins for public access
-  methods: ["GET", "POST"], 
+  origin: ["https://frontend-43oigxs4g-nijlas-projects.vercel.app"],
+  methods: ["GET", "POST"],
   allowedHeaders: ["Content-Type"],
-  credentials: false, // 🔥 Set to true if you need cookies/auth
+  credentials: true, // Enable for auth cookies if needed
 }));
 
 app.use(express.json());
@@ -100,7 +100,13 @@ const upload = multer({ storage });
 // ✅ Image Upload Route
 app.post("/upload", upload.single("image"), async (req, res) => {
   try {
+    console.log("✅ Upload request received");
+
+    // ✅ Log User-Agent to Debug Mobile Issues
+    console.log("📱 User-Agent:", req.headers["user-agent"]);
+
     if (!req.file) {
+      console.error("❌ No file received");
       return res.status(400).json({ error: "No file uploaded" });
     }
 
@@ -115,6 +121,7 @@ app.post("/upload", upload.single("image"), async (req, res) => {
     readableStream.push(null);
 
     const options = { pinataMetadata: { name: req.file.originalname }, pinataOptions: { cidVersion: 1 } };
+
     const file = await pinata.pinFileToIPFS(readableStream, options);
     console.log("✅ Pinata Upload Success:", file);
     const ipfsHash = file.IpfsHash;
@@ -142,7 +149,7 @@ app.post("/upload", upload.single("image"), async (req, res) => {
 
     res.json({ ipfsHash, fileHash, transactionHash: receipt.transactionHash });
   } catch (error) {
-    console.error("❌ Upload Error:", error);
+    console.error("❌ Upload Error:", error.response?.data || error.message);
     res.status(500).json({ error: error.message });
   }
 });
