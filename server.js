@@ -19,7 +19,6 @@ const requiredEnvVars = [
   "CONTRACT_ADDRESS",
   "WALLET_ADDRESS",
   "PRIVATE_KEY",
-  "PORT",
 ];
 
 requiredEnvVars.forEach((key) => {
@@ -188,5 +187,5 @@ app.get("/", (req, res) => {
 });
 
 // ✅ Start Server
-const PORT = process.env.PORT || 5000;
+const PORT = 5000;
 app.listen(PORT, () => console.log(`🚀 Server running on port ${PORT}`));
