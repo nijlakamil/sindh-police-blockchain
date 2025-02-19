@@ -5,7 +5,9 @@ import { Link } from "react-router-dom";
 import sindhpolicelogo from "./sindhpolicelogo.png";
 import "bootstrap/dist/css/bootstrap.min.css";
 import "animate.css";
-import "./upload.css";  // Make sure this is correctly linked
+import "./upload.css"; // Ensure this is correctly linked
+
+const API_BASE_URL = process.env.REACT_APP_API_URL || "https://sindh-police-blockchain-production.up.railway.app";
 
 const Upload = () => {
   const [file, setFile] = useState(null);
@@ -23,7 +25,7 @@ const Upload = () => {
     formData.append("image", file);
 
     try {
-      const response = await axios.post("http://localhost:5000/upload", formData);
+      const response = await axios.post(`${API_BASE_URL}/upload`, formData);
       setIpfsHash(response.data.ipfsHash);
     } catch (error) {
       console.error("❌ Upload Error:", error);
@@ -35,16 +37,11 @@ const Upload = () => {
 
   return (
     <div className="gradient-bg d-flex flex-column align-items-center justify-content-center text-dark p-4">
-      {/* Floating Elements for Animation */}
-      <div className="floating-element"></div>
-      <div className="floating-element"></div>
       <div className="floating-element"></div>
       <div className="floating-element"></div>
 
-      {/* Logo */}
       <img src={sindhpolicelogo} alt="Sindh Police Logo" className="mb-4 animate__animated animate__fadeInDown" style={{ width: "170px", height: "170px" }} />
 
-      {/* Upload Card */}
       <div className="upload-card card p-4 shadow-lg animate__animated animate__fadeInUp">
         <h2 className="text-center text-primary mb-4">Upload Image</h2>
 

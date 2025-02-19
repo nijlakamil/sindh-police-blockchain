@@ -7,6 +7,8 @@ import "bootstrap/dist/css/bootstrap.min.css";
 import "animate.css";
 import "./verify.css";
 
+const API_BASE_URL = process.env.REACT_APP_API_URL || "https://sindh-police-blockchain-production.up.railway.app";
+
 const Verify = () => {
   const [file, setFile] = useState(null);
   const [verifying, setVerifying] = useState(false);
@@ -23,7 +25,7 @@ const Verify = () => {
   const handleFileChange = async (e) => {
     const selectedFile = e.target.files[0];
     setFile(selectedFile);
-    setVerificationResult(""); // Reset previous result
+    setVerificationResult("");
 
     if (selectedFile) {
       setVerifying(true);
@@ -33,7 +35,7 @@ const Verify = () => {
         console.log("Computed File Hash:", fileHash);
 
         // Send the hash to the backend for verification
-        const response = await axios.post("http://localhost:5000/verify", { fileHash });
+        const response = await axios.post(`${API_BASE_URL}/verify`, { fileHash });
 
         // Handle verification response
         if (response.data.match) {

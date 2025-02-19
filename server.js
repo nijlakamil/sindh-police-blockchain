@@ -8,9 +8,9 @@ import { Readable } from "stream";
 import pinataSDK from "@pinata/sdk";
 import crypto from "crypto"; // ✅ For computing file hash
 
-// ✅ Load environment variables
 dotenv.config();
 
+// ✅ Environment Variables Check
 const requiredEnvVars = [
   "MONGO_URI",
   "PINATA_API_KEY",
@@ -31,19 +31,26 @@ requiredEnvVars.forEach((key) => {
 
 // ✅ Initialize Express
 const app = express();
-app.use(cors());
+app.use(cors({
+  origin: "https://frontend-43oigxs4g-nijlas-projects.vercel.app", // ✅ Allow frontend access
+  credentials: true,
+}));
 app.use(express.json());
 
-// ✅ Connect to MongoDB
+// ✅ MongoDB Connection
 mongoose
-  .connect(process.env.MONGO_URI, { useNewUrlParser: true, useUnifiedTopology: true })
+  .connect(process.env.MONGO_URI, {
+    useNewUrlParser: true,
+    useUnifiedTopology: true,
+    serverSelectionTimeoutMS: 5000,
+  })
   .then(() => console.log("✅ Connected to MongoDB"))
   .catch((err) => {
     console.error("❌ MongoDB Connection Error:", err);
     process.exit(1);
   });
 
-// ✅ Image Schema (Storing IPFS Hash + SHA-256 file hash)
+// ✅ Image Schema
 const ImageSchema = new mongoose.Schema({
   ipfsHash: String,
   fileHash: String, // ✅ Stores the SHA-256 hash for verification
@@ -85,7 +92,7 @@ const privateKey = process.env.PRIVATE_KEY;
 const storage = multer.memoryStorage();
 const upload = multer({ storage });
 
-// ✅ Image Upload Route (Now Stores fileHash)
+// ✅ Image Upload Route
 app.post("/upload", upload.single("image"), async (req, res) => {
   try {
     if (!req.file) {
@@ -135,7 +142,7 @@ app.post("/upload", upload.single("image"), async (req, res) => {
   }
 });
 
-// ✅ Image Verification Route (Compares fileHash from frontend)
+// ✅ Image Verification Route
 app.post("/verify", async (req, res) => {
   try {
     const { fileHash } = req.body;
@@ -158,6 +165,11 @@ app.post("/verify", async (req, res) => {
     console.error("Verification Error:", error);
     res.status(500).json({ error: error.message });
   }
+});
+
+// ✅ Server Health Check Route
+app.get("/", (req, res) => {
+  res.send("🚀 Sindh Police Blockchain API is running!");
 });
 
 // ✅ Start Server
