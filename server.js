@@ -6,7 +6,7 @@ import mongoose from "mongoose";
 import dotenv from "dotenv";
 import { Readable } from "stream";
 import pinataSDK from "@pinata/sdk";
-import crypto from "crypto"; // ✅ For computing file hash
+import crypto from "crypto";
 
 dotenv.config();
 
@@ -32,13 +32,15 @@ requiredEnvVars.forEach((key) => {
 // ✅ Initialize Express
 const app = express();
 
-// ✅ CORS Configuration (Allow only your Vercel frontend)
-app.use(cors({
-  origin: ["https://frontend-43oigxs4g-nijlas-projects.vercel.app"],
-  methods: ["GET", "POST"],
-  allowedHeaders: ["Content-Type"],
-  credentials: true, // Enable for auth cookies if needed
-}));
+// ✅ CORS Configuration (Allows access from anywhere)
+app.use(
+  cors({
+    origin: "*", // 🔥 Allow access from any device
+    methods: ["GET", "POST"],
+    allowedHeaders: ["Content-Type"],
+    credentials: false, // Set to true if using authentication cookies
+  })
+);
 
 app.use(express.json());
 
@@ -48,6 +50,7 @@ mongoose
     useNewUrlParser: true,
     useUnifiedTopology: true,
     serverSelectionTimeoutMS: 5000,
+    connectTimeoutMS: 10000, // Prevents connection timeout issues
   })
   .then(() => console.log("✅ Connected to MongoDB"))
   .catch((err) => {
@@ -58,7 +61,7 @@ mongoose
 // ✅ Image Schema
 const ImageSchema = new mongoose.Schema({
   ipfsHash: String,
-  fileHash: String, // ✅ Stores the SHA-256 hash for verification
+  fileHash: String,
   uploader: String,
   timestamp: Number,
 });
@@ -71,23 +74,24 @@ const pinata = new pinataSDK(process.env.PINATA_API_KEY, process.env.PINATA_SECR
 const web3 = new Web3(process.env.POLYGON_RPC_URL);
 const contractABI = [
   {
-    "anonymous": false,
-    "inputs": [
-      { "indexed": false, "internalType": "string", "name": "ipfsHash", "type": "string" },
-      { "indexed": false, "internalType": "uint256", "name": "timestamp", "type": "uint256" },
-      { "indexed": false, "internalType": "address", "name": "uploader", "type": "address" },
+    anonymous: false,
+    inputs: [
+      { indexed: false, internalType: "string", name: "ipfsHash", type: "string" },
+      { indexed: false, internalType: "uint256", name: "timestamp", type: "uint256" },
+      { indexed: false, internalType: "address", name: "uploader", type: "address" },
     ],
-    "name": "ImageStored",
-    "type": "event",
+    name: "ImageStored",
+    type: "event",
   },
   {
-    "inputs": [{ "internalType": "string", "name": "_ipfsHash", "type": "string" }],
-    "name": "storeImage",
-    "outputs": [],
-    "stateMutability": "nonpayable",
-    "type": "function",
+    inputs: [{ internalType: "string", name: "_ipfsHash", type: "string" }],
+    name: "storeImage",
+    outputs: [],
+    stateMutability: "nonpayable",
+    type: "function",
   },
 ];
+
 const contractAddress = process.env.CONTRACT_ADDRESS;
 const contract = new web3.eth.Contract(contractABI, contractAddress);
 const walletAddress = process.env.WALLET_ADDRESS;
@@ -101,9 +105,8 @@ const upload = multer({ storage });
 app.post("/upload", upload.single("image"), async (req, res) => {
   try {
     console.log("✅ Upload request received");
-
-    // ✅ Log User-Agent to Debug Mobile Issues
     console.log("📱 User-Agent:", req.headers["user-agent"]);
+    console.log("🌍 Request Origin:", req.headers.origin);
 
     if (!req.file) {
       console.error("❌ No file received");
@@ -149,8 +152,9 @@ app.post("/upload", upload.single("image"), async (req, res) => {
 
     res.json({ ipfsHash, fileHash, transactionHash: receipt.transactionHash });
   } catch (error) {
-    console.error("❌ Upload Error:", error.response?.data || error.message);
-    res.status(500).json({ error: error.message });
+    console.error("❌ Upload Error:", error.message);
+    console.error("🔥 Full Error:", error);
+    res.status(500).json({ error: error.message || "An unexpected error occurred" });
   }
 });
 

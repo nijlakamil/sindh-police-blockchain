@@ -7,7 +7,7 @@ import "bootstrap/dist/css/bootstrap.min.css";
 import "animate.css";
 import "./upload.css"; // Ensure this is correctly linked
 
-const API_BASE_URL = process.env.REACT_APP_API_URL || "https://sindh-police-blockchain-production.up.railway.app";
+const API_BASE_URL ="https://sindh-police-blockchain-production.up.railway.app";
 
 const Upload = () => {
   const [file, setFile] = useState(null);

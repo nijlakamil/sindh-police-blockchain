@@ -7,7 +7,7 @@ import "bootstrap/dist/css/bootstrap.min.css";
 import "animate.css";
 import "./verify.css";
 
-const API_BASE_URL = process.env.REACT_APP_API_URL || "https://sindh-police-blockchain-production.up.railway.app";
+const API_BASE_URL ="https://sindh-police-blockchain-production.up.railway.app";
 
 const Verify = () => {
   const [file, setFile] = useState(null);
