@@ -1,0 +1,44 @@
+/* 🌊 Soft White Background with Animated Light Blue Gradient */
+.gradient-bg {
+    background: linear-gradient(-45deg, white, rgba(223, 237, 245, 0.6), white, rgba(179, 215, 236, 0.4));
+    background-size: 400% 400%;
+    animation: gradientAnimation 6s ease infinite; /* Gradient Animation */
+    height: 100vh;
+    width: 100%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    position: relative;
+}
+
+/* 🎨 Gradient Animation */
+@keyframes gradientAnimation {
+    0% { background-position: 0% 50%; }
+    50% { background-position: 100% 50%; }
+    100% { background-position: 0% 50%; }
+}
+
+/* ✨ Floating Glow Effect */
+.floating-element {
+    position: absolute;
+    width: 80px;
+    height: 80px;
+    background: rgba(173, 216, 230, 0.3); /* Ultra Light Blue */
+    border-radius: 50%;
+    animation: float 6s ease-in-out infinite, glow 3s ease-in-out infinite alternate; /* Add glow animation */
+    opacity: 0.5;
+    filter: blur(15px);
+}
+
+/* 🎈 Floating Animation */
+@keyframes float {
+    0% { transform: translateY(0px); }
+    50% { transform: translateY(-15px); }
+    100% { transform: translateY(0px); }
+}
+
+/* 🌟 Glow Effect Animation */
+@keyframes glow {
+    0% { opacity: 0.3; filter: blur(10px); }
+    100% { opacity: 0.5; filter: blur(20px); }
+}
