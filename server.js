@@ -38,7 +38,6 @@ app.use(
     origin: "*", // 🔥 Allow access from any device
     methods: ["GET", "POST"],
     allowedHeaders: ["Content-Type"],
-    credentials: false, // Set to true if using authentication cookies
   })
 );
 
